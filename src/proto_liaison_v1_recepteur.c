@@ -6,6 +6,7 @@
  *********************************************/
  
 #include <stdio.h>
+ #include <string.h>
 #include "application.h"
 #include "services_liaison.h"
 #include "couche_liaison.h"
@@ -16,8 +17,8 @@
 /* =============================== */
 int main(int argc, char* argv[])
 {
-	char message[MTU];      /* message de l'application */
-	int taille_msg;         /* taille du message */
+	char message[MTU+1];      /* message de l'application */
+	int taille_msg=0;         /* taille du message */
 	trame_t trame;          /* trame utilisée par le protocole liaison */
 		
 	init_physique(RECEPTION);
@@ -25,13 +26,18 @@ int main(int argc, char* argv[])
 	printf("[DL] Initialisation physique : OK.\n");
 	printf("[DL] Debut execution protocole liaison.\n");
 
-	/* récupération d'une trame de la couche physique */
-	de_canal(&trame);
+	do {	
+		/* récupération d'une trame de la couche physique */
+		de_canal(&trame);
 
-	/* A FAIRE... lire données */		
-	
-	/* remise des données à la couche application */
-	vers_application(L_UNIT_DATA_ind, message, taille_msg);
+		taille_msg = trame.lg_info;
+		strcpy(message, trame.info);		
+		
+		/* remise des données à la couche application */
+		vers_application(L_UNIT_DATA_ind, message, taille_msg);
+		
+		
+	} while(taille_msg > 0);
 
 	printf("[DL] Fin execution protocole liaison.\n");
 	return 0;

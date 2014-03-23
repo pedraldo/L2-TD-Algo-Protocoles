@@ -6,6 +6,7 @@
  *********************************************/
 
 #include <stdio.h>
+#include <string.h>
 #include "application.h"
 #include "services_liaison.h"
 #include "couche_liaison.h"
@@ -26,20 +27,23 @@ int main(int argc, char* argv[])
 	printf("[DL] Initialisation physique : OK.\n");
 	printf("[DL] Debut execution protocole liaison.\n");
 
-	de_application(&service_liaison, message, &taille_msg);
+	do {
+		de_application(&service_liaison, message, &taille_msg);
 		
-	/* lecture primitive de service */
-	if (service_liaison == L_UNIT_DATA_req) {
-		
-		/* A FAIRE... construire trame */
-		
-		/* remise à la couche physique pour emission */
-		vers_canal(&trame);
-	}
-	else {
-		printf("[DL] Service liaison inconnu !\n");
-	}
-	
+		/* lecture primitive de service */
+		if (service_liaison == L_UNIT_DATA_req) {
+			
+			trame.lg_info = taille_msg;
+			strcpy(trame.info, message);
+			
+			/* remise à la couche physique pour emission */
+			vers_canal(&trame);
+		}
+		else {
+			printf("[DL] Service liaison inconnu !\n");
+		}
+	} while(taille_msg > 0);
+
 	printf("[DL] Fin execution protocole liaison.\n");
 	return 0;
 }
