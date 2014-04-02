@@ -32,3 +32,8 @@ typedef struct trame_s {
 
 
 #endif
+
+
+char generer_controle(trame_t trame);
+
+int verifier_controle(trame_t trame);
