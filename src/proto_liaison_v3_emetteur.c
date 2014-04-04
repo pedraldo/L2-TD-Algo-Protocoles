@@ -38,11 +38,13 @@ int main(int argc, char* argv[])
 		/* lecture primitive de service */
 		if (service_liaison == L_UNIT_DATA_req) {
 			
+			
+			/*Construction trame à envoyer*/
 			trame.lg_info = taille_msg;
 			strcpy(trame.info, message);
-			trame.fcs = generer_controle(trame);
-			trame.type = DATA;
 			trame.num_seq = numero_sequence;
+			trame.type = DATA;
+			trame.fcs = generer_controle(trame);
 			numero_sequence++;
 			
 			/* remise à la couche physique pour emission */
@@ -53,15 +55,17 @@ int main(int argc, char* argv[])
 			printf("[DL] Service liaison inconnu !\n");
 		}
 
+		/*Gestion réception*/
 		depart_compteur(1, 500);
 		numTimerTrame = attendre();
 		
+		/*Si trame recue, arreter compteur, importation des infos de la couche app*/
 		if(numTimerTrame == 0){
-			attendre();
 			arreter_compteur(1);	
 			de_application(&service_liaison, message, &taille_msg);
 		}
 		
+		/*Sinon incrémentation du nombre de retransmission*/
 		else{
 			nbRetrans ++;
 		}
